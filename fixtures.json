@@ -1,0 +1,35 @@
+[
+{
+    "model": "book.book",
+    "pk": 1,
+    "fields": {
+        "title": "Незнакомцы",
+        "author": "А. Хилл",
+        "pages": 234,
+        "description": "О двух людях роман",
+        "published_date": "2024-07-27"
+    }
+},
+{
+    "model": "book.book",
+    "pk": 2,
+    "fields": {
+        "title": "Фиалковое поле",
+        "author": "Д.А. Арликов",
+        "pages": 500,
+        "description": "Автобиографичный роман",
+        "published_date": "2021-07-27"
+    }
+},
+{
+    "model": "book.book",
+    "pk": 5,
+    "fields": {
+        "title": "О лжи ",
+        "author": "Л. Райс",
+        "pages": 108,
+        "description": "Детективная история",
+        "published_date": "2012-07-06"
+    }
+}
+]

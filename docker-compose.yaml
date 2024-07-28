@@ -1,0 +1,61 @@
+version: '3'
+
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
+  wsgi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: gpt-app-backend-wsgi:latest
+    command: >
+      sh -c "python3 manage.py collectstatic --noinput &&
+             python3 manage.py makemigrations &&
+             python3 manage.py migrate &&
+             python3 manage.py initadmin &&
+             python3 manage.py loaddata fixtures.json &&
+             gunicorn config.wsgi:application --bind 0.0.0.0:8000 --access-logfile -"
+    volumes:
+      - ./logs/wsgi_docker/:/config/logs/
+    depends_on:
+      - db
+    restart: always
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env_docker
+
+  db:
+    image: postgres:latest
+    environment:
+       POSTGRES_DB: book_api
+       POSTGRES_USER: book_api
+       POSTGRES_PASSWORD: 1245
+    ports:
+      - "5432:5432"
+
+  celery:
+    build:
+      context: .
+    command: >
+      sh -c "celery -A config.celery worker -B -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler"
+    volumes:
+      - ./logs/celery_docker/:/config/logs/
+    restart: always
+    depends_on:
+      - redis
+      - db
+      - wsgi
+    env_file:
+      - .env_docker
+
+  nginx:
+    build: ./nginx
+    ports:
+      - "8080:80"
+    restart: always
+    depends_on:
+      - wsgi
